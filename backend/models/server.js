@@ -11,9 +11,9 @@ class Server {
     this.app = express();
     this.port = process.env.PORT || 8080;
 
-    dbConnection();
-
+    
     //DB Mongo
+    dbConnection();
 
     //http server
     this.server = http.createServer(this.app);
@@ -28,7 +28,10 @@ class Server {
 
   middlewares() {
     this.app.use(cors());
-    this.app.use(express.static(path.resolve(__dirname, "../public")));
+    // this.app.use(express.static(path.resolve(__dirname, "../public")));
+    this.app.use(express.json());
+    this.app.use("/api/login", require("../router/auth"));
+    this.app.use("/api/messages", require("../router/messages"));
   }
   configSockets() {
     new Sockets(this.io);
