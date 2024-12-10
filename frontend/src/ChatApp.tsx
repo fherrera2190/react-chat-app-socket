@@ -1,13 +1,17 @@
 import { AuthProvider } from "./auth/AuthProvider";
-import { SocketProvider } from "./context";
+import { ChatProvider, SocketProvider } from "./context";
 import { AppRouter } from "./router/AppRouter";
+import moment from "moment";
+moment.locale('es');
 
 export const ChatApp = () => {
   return (
-    <AuthProvider>
-      <SocketProvider>
-        <AppRouter />
-      </SocketProvider>
-    </AuthProvider>
+    <ChatProvider>
+      <AuthProvider>
+        <SocketProvider>
+          <AppRouter />
+        </SocketProvider>
+      </AuthProvider>
+    </ChatProvider>
   );
 };

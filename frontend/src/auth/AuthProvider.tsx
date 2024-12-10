@@ -1,6 +1,9 @@
-import { ReactNode, useCallback, useState } from "react";
+import { ReactNode, useCallback, useContext, useState } from "react";
 import AuthContext from "./AuthContext";
 import { fetchWithoutToken, fetchWithToken } from "../helpers/fetch";
+import { AuthResponse } from "../interfaces";
+import ChatContext from "../context/chat/ChatContex";
+import { ActionChatType } from "../context";
 
 interface Props {
   children: ReactNode;
@@ -21,9 +24,9 @@ const initialSate: AuthState = {
 
 export const AuthProvider = ({ children }: Props) => {
   const [auth, setAuth] = useState(initialSate);
-
+  const { dispatch } = useContext(ChatContext);
   const login = async (email: string, password: string) => {
-    const resp = await fetchWithoutToken(
+    const resp = await fetchWithoutToken<AuthResponse>(
       "api/login",
       {
         email,
@@ -41,14 +44,13 @@ export const AuthProvider = ({ children }: Props) => {
         name: resp.user.name,
         uid: resp.user.uid,
       });
-      console.log("Autenticado!");
     }
 
     return resp;
   };
 
   const register = async (name: string, email: string, password: string) => {
-    const resp = await fetchWithoutToken(
+    const resp = await fetchWithoutToken<AuthResponse>(
       "api/login/new",
       {
         name,
@@ -67,7 +69,6 @@ export const AuthProvider = ({ children }: Props) => {
         name: resp.user.name,
         uid: resp.user.uid,
       });
-      console.log("Registrado!");
     }
 
     return resp;
@@ -84,8 +85,8 @@ export const AuthProvider = ({ children }: Props) => {
       return false;
     }
 
-    const resp = await fetchWithToken("api/login/renew");
-  
+    const resp = await fetchWithToken<AuthResponse>("api/login/renew");
+
     if (resp.ok) {
       localStorage.setItem("token", resp.token);
 
@@ -97,7 +98,6 @@ export const AuthProvider = ({ children }: Props) => {
         name: user.name,
         uid: user.uid,
       });
-      console.log("Token renovado!");
       return true;
     } else {
       setAuth({
@@ -114,13 +114,13 @@ export const AuthProvider = ({ children }: Props) => {
       checking: false,
       logged: false,
     });
+    dispatch({ type: ActionChatType.clearMessages });
   };
 
   return (
     <AuthContext.Provider
       value={{
         auth,
-
         login,
         register,
         verifyToken,

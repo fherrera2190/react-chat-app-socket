@@ -1,15 +1,24 @@
+import { useContext, useEffect } from "react";
 import { IncomingMessage, OutgoingMessage, SendMessage } from "./";
-
+import ChatContext from "../context/chat/ChatContex";
+import AuthContext from "../auth/AuthContext";
 export const Messages = () => {
-  const msgs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  const { chatState, messageDiv, bottomScroll } = useContext(ChatContext);
+
+  const { auth } = useContext(AuthContext);
+
+  useEffect(() => {
+    bottomScroll();
+  }, [chatState, bottomScroll]);
+
   return (
     <div className="mesgs">
-      <div className="msg_history">
-        {msgs.map((msg) =>
-          msg % 2 ? (
-            <OutgoingMessage key={msg} />
+      <div ref={messageDiv} className="msg_history">
+        {chatState.messages.map((msg) =>
+          msg.to === auth.uid ? (
+            <IncomingMessage key={msg._id} message={msg} />
           ) : (
-            <IncomingMessage key={msg} />
+            <OutgoingMessage key={msg._id} message={msg} />
           )
         )}
       </div>

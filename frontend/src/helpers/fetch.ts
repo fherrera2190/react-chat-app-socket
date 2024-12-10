@@ -1,16 +1,14 @@
-import { AuthResponse, AuthResponseError } from "../interfaces";
-
 const baseUrl = import.meta.env.VITE_BASE_URL;
 
-export const fetchWithoutToken = async (
+export const fetchWithoutToken = async <T>(
   endpoint: string,
   data: { [key: string]: string },
   method: string = "GET"
-): Promise<AuthResponse | AuthResponseError> => {
+): Promise<T> => {
   const url = `${baseUrl}/${endpoint}`;
   if (method === "GET") {
     const response = await fetch(url);
-    return await response.json();
+    return (await response.json()) as T;
   } else {
     const response = await fetch(url, {
       method,
@@ -20,15 +18,15 @@ export const fetchWithoutToken = async (
       body: JSON.stringify(data),
     });
 
-    return await response.json();
+    return (await response.json()) as T;
   }
 };
 
-export const fetchWithToken = async (
+export const fetchWithToken = async <T>(
   endpoint: string,
   data?: { [key: string]: string },
   method: string = "GET"
-): Promise<AuthResponse | AuthResponseError> => {
+): Promise<T> => {
   const url = `${baseUrl}/${endpoint}`;
   const token = localStorage.getItem("token") || "";
 
@@ -38,7 +36,7 @@ export const fetchWithToken = async (
         "x-token": token,
       },
     });
-    return await response.json();
+    return (await response.json()) as T;
   } else {
     const response = await fetch(url, {
       method,
@@ -49,6 +47,6 @@ export const fetchWithToken = async (
       body: JSON.stringify(data),
     });
 
-    return await response.json();
+    return (await response.json()) as T;
   }
 };

@@ -1,4 +1,9 @@
-const { userConnected, userDisconnected } = require("../controllers/sockets");
+const {
+  userConnected,
+  userDisconnected,
+  getUsers,
+  saveMessage,
+} = require("../controllers/sockets");
 const { verifyJWT } = require("../helpers/jwt");
 
 class Sockets {
@@ -20,23 +25,20 @@ class Sockets {
 
       await userConnected(uid);
 
-      //validate jwt
-      //if is not valid, disconnect
-      //to know if the user is active through uid
-      // emit all users connected
-      // socket join
-      // listen when the user sends a message
-      //message-personal
-      //disconnect
-      //mark in the db that the user is offline
+      socket.join(uid);
 
-      // socket.on("mensaje-to-server", (data) => {
+      this.io.emit("list-users", await getUsers());
 
-      // });
+      socket.on("personal-message", async (payload) => {
+        const message = await saveMessage(payload);
+        this.io.to(payload.to).emit("personal-message", message);
+        this.io.to(payload.from).emit("personal-message", message);
+      });
 
-      socket.on("disconnect",async () => {
+      socket.on("disconnect", async () => {
         console.log("Cliente desconectado");
         await userDisconnected(uid);
+        this.io.emit("list-users", await getUsers());
       });
     });
   }

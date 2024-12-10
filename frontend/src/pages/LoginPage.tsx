@@ -9,14 +9,14 @@ interface FormState {
   rememberme: boolean;
 }
 
-const initialFormState = {
+const initialFormState: FormState = {
   email: "",
   password: "",
   rememberme: false,
 };
 
 export const LoginPage = () => {
-  const [form, setForm] = useState<FormState>(initialFormState);
+  const [form, setForm] = useState(initialFormState);
 
   const { login } = useContext(AuthContext);
 
